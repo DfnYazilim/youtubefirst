@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:youtubefirst/providers/todo_provider.dart';
 
 import '../helpers/api.dart';
 import '../models/todo_model.dart';
@@ -16,6 +18,14 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
   final _saveKey = GlobalKey<FormState>();
   TextEditingController _title = TextEditingController();
   TextEditingController _description = TextEditingController();
+  late TodoProvider tp;
+
+  @override
+  void initState() {
+     tp = Provider.of<TodoProvider>(context,listen: false);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -60,9 +70,7 @@ class _NewTodoScreenState extends State<NewTodoScreen> {
                         title: _title.text,
                         description: _description.text);
 
-                    Api()
-                        .dioPost(
-                        url: 'todo', obj: tomodel.toJson())
+                    tp.newTodo(model: tomodel)
                         .then((value) {
                       if (value?.statusCode == 200) {
                         // widget.fn = true;

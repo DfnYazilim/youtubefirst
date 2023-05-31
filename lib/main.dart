@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:youtubefirst/providers/todo_provider.dart';
 import 'package:youtubefirst/screens/main_screen.dart';
 import 'package:youtubefirst/screens/todo_list_screen.dart';
+import 'package:youtubefirst/screens/todo_list_v2.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_)=>TodoProvider()),
+  ],child: const MyApp(),),);
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +23,7 @@ class MyApp extends StatelessWidget {
 
       ),
       debugShowCheckedModeBanner: false,
-      home: TodoList(),
+      home: TodoListV2(),
     );
   }
 }
