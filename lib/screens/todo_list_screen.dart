@@ -15,7 +15,8 @@ class TodoList extends StatefulWidget {
   _TodoListState createState() => _TodoListState();
 }
 
-class _TodoListState extends State<TodoList> with SingleTickerProviderStateMixin {
+class _TodoListState extends State<TodoList>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<TodoModel> _todos = [];
   bool _isLoading = false;
@@ -70,211 +71,244 @@ class _TodoListState extends State<TodoList> with SingleTickerProviderStateMixin
           ],
         ),
       ),
-
       body: _isLoading
           ? LoadingWidget(
               color: Colors.orange,
             )
-          : true ? TabBarView(
-        controller: _tabController,
-        children:List.generate(2, (tabIndex) => ListView.builder(
-          itemBuilder: (context, i) {
-            var item = _todos.where((element) => element.isDone == (tabIndex != 0)).toList()[i];
-            return  Card(
-              child: ListTile(
-                onTap: () {
-                  if (item.isDone == false) {
-                    showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Text("Is this done"),
-                          content: Text(item.title ?? "-"),
-                          actions: [
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text("Cancel")),
-                            ElevatedButton(
-                                onPressed: () {
-                                  Api().dioPost(
-                                      url: 'todo/utku?id=${item.id}',
-                                      obj: {}).then((value) {
-                                    if (value?.statusCode == 200) {
-                                      setState(() {
-                                        item.isDone = true;
-                                      });
-                                    } else {
-                                      Fluttertoast.showToast(
-                                          msg: "Couldnt't update",
-                                          backgroundColor: Colors.red);
+          : true
+              ? TabBarView(
+                  controller: _tabController,
+                  children: List.generate(
+                      2,
+                      (tabIndex) => ListView.builder(
+                            itemBuilder: (context, i) {
+                              var item = _todos
+                                  .where((element) =>
+                                      element.isDone == (tabIndex != 0))
+                                  .toList()[i];
+                              return Card(
+                                child: ListTile(
+                                  onTap: () {
+                                    if (item.isDone == false) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                                title: Text("Is this done"),
+                                                content:
+                                                    Text(item.title ?? "-"),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("Cancel")),
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        Api().dioPost(
+                                                            url:
+                                                                'todo/utku?id=${item.id}',
+                                                            obj: {}).then((value) {
+                                                          if (value
+                                                                  ?.statusCode ==
+                                                              200) {
+                                                            setState(() {
+                                                              item.isDone =
+                                                                  true;
+                                                            });
+                                                          } else {
+                                                            Fluttertoast.showToast(
+                                                                msg:
+                                                                    "Couldnt't update",
+                                                                backgroundColor:
+                                                                    Colors.red);
+                                                          }
+                                                          Navigator.pop(
+                                                              context);
+                                                        });
+                                                      },
+                                                      child: Text("Done")),
+                                                ],
+                                              ));
                                     }
-                                    Navigator.pop(context);
-                                  });
-                                },
-                                child: Text("Done")),
-                          ],
-                        ));
-                  }
-                },
-                trailing: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text('Are you sure about to delete'),
-                            content: Text("${item.title ?? "-"}"),
-                            actions: [
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
                                   },
-                                  child: Text("Cancel")),
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Api()
-                                        .dioDelete(
-                                        url: 'todo?id=${item.id}')
-                                        .then((value) {
-                                      if (value?.statusCode == 200) {
-                                        getDatas()
-                                            .then((value) => null);
-                                      } else {
-                                        Fluttertoast.showToast(
-                                            msg: "Couldnt't delete",
-                                            backgroundColor:
-                                            Colors.red);
-                                      }
-                                      Navigator.pop(context);
-                                    });
-                                  },
-                                  child: Text("Delete")),
-                            ],
-                          ));
-                    },
-                    child: Icon(Icons.remove_circle_outline,
-                        color: Colors.red)),
-                leading: item.isDone == true
-                    ? Icon(
-                  Icons.check,
-                  color: Colors.green,
-                )
-                    : Icon(Icons.check_box_outline_blank),
-                title: Text("${item.title ?? "-"}"),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${item.description ?? "-"}",
-                      textAlign: TextAlign.left,
-                    ),
-                    Text(item.createdTime.mongoDateTime()),
-                  ],
-                ),
-              ),
-            );
-          },
-          itemCount: _todos.where((element) => element.isDone == (tabIndex != 0)).length,
-        )),
-      ):  ListView.builder(
-              itemBuilder: (context, i) {
-                var item = _todos[i];
-                return Card(
-                  child: ListTile(
-                    onTap: () {
-                      if (item.isDone == false) {
-                        showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                                  title: Text("Is this done"),
-                                  content: Text(item.title ?? "-"),
-                                  actions: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text("Cancel")),
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Api().dioPost(
-                                              url: 'todo/utku?id=${item.id}',
-                                              obj: {}).then((value) {
-                                            if (value?.statusCode == 200) {
-                                              setState(() {
-                                                item.isDone = true;
-                                              });
-                                            } else {
-                                              Fluttertoast.showToast(
-                                                  msg: "Couldnt't update",
-                                                  backgroundColor: Colors.red);
-                                            }
-                                            Navigator.pop(context);
-                                          });
-                                        },
-                                        child: Text("Done")),
-                                  ],
-                                ));
-                      }
-                    },
-                    trailing: GestureDetector(
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                    title: Text('Are you sure about to delete'),
-                                    content: Text("${item.title ?? "-"}"),
-                                    actions: [
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text("Cancel")),
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            Api()
-                                                .dioDelete(
-                                                    url: 'todo?id=${item.id}')
-                                                .then((value) {
-                                              if (value?.statusCode == 200) {
-                                                getDatas()
-                                                    .then((value) => null);
-                                              } else {
-                                                Fluttertoast.showToast(
-                                                    msg: "Couldnt't delete",
-                                                    backgroundColor:
-                                                        Colors.red);
-                                              }
-                                              Navigator.pop(context);
-                                            });
-                                          },
-                                          child: Text("Delete")),
+                                  trailing: GestureDetector(
+                                      onTap: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (_) => AlertDialog(
+                                                  title: Text(
+                                                      'Are you sure about to delete'),
+                                                  content: Text(
+                                                      "${item.title ?? "-"}"),
+                                                  actions: [
+                                                    ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text("Cancel")),
+                                                    ElevatedButton(
+                                                        onPressed: () {
+                                                          Api()
+                                                              .dioDelete(
+                                                                  url:
+                                                                      'todo?id=${item.id}')
+                                                              .then((value) {
+                                                            if (value
+                                                                    ?.statusCode ==
+                                                                200) {
+                                                              getDatas().then(
+                                                                  (value) =>
+                                                                      null);
+                                                            } else {
+                                                              Fluttertoast.showToast(
+                                                                  msg:
+                                                                      "Couldnt't delete",
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red);
+                                                            }
+                                                            Navigator.pop(
+                                                                context);
+                                                          });
+                                                        },
+                                                        child: Text("Delete")),
+                                                  ],
+                                                ));
+                                      },
+                                      child: Icon(Icons.remove_circle_outline,
+                                          color: Colors.red)),
+                                  leading: item.isDone == true
+                                      ? Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                        )
+                                      : Icon(Icons.check_box_outline_blank),
+                                  title: Text("${item.title ?? "-"}"),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${item.description ?? "-"}",
+                                        textAlign: TextAlign.left,
+                                      ),
+                                      Text(item.createdTime.mongoDateTime()),
                                     ],
-                                  ));
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount: _todos
+                                .where((element) =>
+                                    element.isDone == (tabIndex != 0))
+                                .length,
+                          )),
+                )
+              : ListView.builder(
+                  itemBuilder: (context, i) {
+                    var item = _todos[i];
+                    return Card(
+                      child: ListTile(
+                        onTap: () {
+                          if (item.isDone == false) {
+                            showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                      title: Text("Is this done"),
+                                      content: Text(item.title ?? "-"),
+                                      actions: [
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text("Cancel")),
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              Api().dioPost(
+                                                  url:
+                                                      'todo/utku?id=${item.id}',
+                                                  obj: {}).then((value) {
+                                                if (value?.statusCode == 200) {
+                                                  setState(() {
+                                                    item.isDone = true;
+                                                  });
+                                                } else {
+                                                  Fluttertoast.showToast(
+                                                      msg: "Couldnt't update",
+                                                      backgroundColor:
+                                                          Colors.red);
+                                                }
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                            child: Text("Done")),
+                                      ],
+                                    ));
+                          }
                         },
-                        child: Icon(Icons.remove_circle_outline,
-                            color: Colors.red)),
-                    leading: item.isDone == true
-                        ? Icon(
-                            Icons.check,
-                            color: Colors.green,
-                          )
-                        : Icon(Icons.check_box_outline_blank),
-                    title: Text("${item.title ?? "-"}"),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${item.description ?? "-"}",
-                          textAlign: TextAlign.left,
+                        trailing: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                        title: Text(
+                                            'Are you sure about to delete'),
+                                        content: Text("${item.title ?? "-"}"),
+                                        actions: [
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text("Cancel")),
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                Api()
+                                                    .dioDelete(
+                                                        url:
+                                                            'todo?id=${item.id}')
+                                                    .then((value) {
+                                                  if (value?.statusCode ==
+                                                      200) {
+                                                    getDatas()
+                                                        .then((value) => null);
+                                                  } else {
+                                                    Fluttertoast.showToast(
+                                                        msg: "Couldnt't delete",
+                                                        backgroundColor:
+                                                            Colors.red);
+                                                  }
+                                                  Navigator.pop(context);
+                                                });
+                                              },
+                                              child: Text("Delete")),
+                                        ],
+                                      ));
+                            },
+                            child: Icon(Icons.remove_circle_outline,
+                                color: Colors.red)),
+                        leading: item.isDone == true
+                            ? Icon(
+                                Icons.check,
+                                color: Colors.green,
+                              )
+                            : Icon(Icons.check_box_outline_blank),
+                        title: Text("${item.title ?? "-"}"),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${item.description ?? "-"}",
+                              textAlign: TextAlign.left,
+                            ),
+                            Text(item.createdTime.mongoDateTime()),
+                          ],
                         ),
-                        Text(item.createdTime.mongoDateTime()),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              itemCount: _todos.length,
-            ),
+                      ),
+                    );
+                  },
+                  itemCount: _todos.length,
+                ),
     );
   }
 }
